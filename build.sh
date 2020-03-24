@@ -13,7 +13,7 @@ cd build
 
 npm install --silent
 
-./node_modules/.bin/pkg . --targets node12-win-x64 --output ../bin/bgpalerter-win-x64
+#./node_modules/.bin/pkg . --targets node12-win-x64 --output ../bin/bgpalerter-win-x64
 
 ./node_modules/.bin/pkg . --targets node12-linux-x64 --output ../bin/bgpalerter-linux-x64
 
