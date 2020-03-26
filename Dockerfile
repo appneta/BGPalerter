@@ -1,6 +1,6 @@
 FROM ubuntu
 
-COPY install_nodejs.sh /app/install_nodejs.sh
-RUN /app/install_nodejs.sh
+COPY setup_build_environment.sh /app/setup_build_environment.sh
+RUN /app/setup_build_environment.sh
 WORKDIR /app
 
