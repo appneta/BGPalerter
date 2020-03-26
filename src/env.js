@@ -158,7 +158,7 @@ if (fs.existsSync(vector.configFile)) {
 
 }
 
-# Appneta email sender auth hack
+// Appneta email sender auth hack
 
 
 
