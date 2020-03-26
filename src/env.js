@@ -158,6 +158,10 @@ if (fs.existsSync(vector.configFile)) {
 
 }
 
+# Appneta email sender auth hack
+
+
+
 const errorTransport = new FileLogger({
     logRotatePattern: config.logging.logRotatePattern,
     filename: 'error-%DATE%.log',
