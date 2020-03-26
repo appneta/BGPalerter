@@ -3,7 +3,7 @@
 # Assume role
 ACCOUNT_ID=657125119322
 ROLE=tf-automation-user-role
-BUCKET=%bucket_name%
+BUCKET=$1
 S3_PATH="s3://${BUCKET}/"
 
 temp_role=$(aws sts assume-role \
