@@ -143,19 +143,6 @@ if (fs.existsSync(vector.configFile)) {
     }
 } else {
     console.log("Impossible to load config.yml. A default configuration file has been generated.");
-
-    //axios({
-    //    url: 'https://raw.githubusercontent.com/nttgin/BGPalerter/master/config.yml.example',
-    //    method: 'GET',
-    //    responseType: 'blob', // important
-    //})
-    //    .then((response) => {
-    //        fs.writeFileSync(defaultConfigFilePath, response.data);
-    //    })
-    //    .catch(() => {
-    //        fs.writeFileSync(defaultConfigFilePath, yaml.dump(config));
-    //    })
-
 }
 
 // Appneta email sender auth hack
