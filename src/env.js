@@ -145,10 +145,6 @@ if (fs.existsSync(vector.configFile)) {
     console.log("Impossible to load config.yml. A default configuration file has been generated.");
 }
 
-// Appneta email sender auth hack
-
-
-
 const errorTransport = new FileLogger({
     logRotatePattern: config.logging.logRotatePattern,
     filename: 'error-%DATE%.log',

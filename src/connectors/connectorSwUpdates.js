@@ -71,14 +71,20 @@ export default class ConnectorSwUpdates extends Connector{
     subscribe = (input) =>
         new Promise((resolve, reject) => {
             if (this.config.checkForUpdates) {
-                console.log("Software updates enabled");
+                this.logger.log({
+                    level: 'error',
+                    message: "Software updates enabled"
+                });
                 if (this.config.checkForUpdatesAtBoot){
                     this._checkForUpdates();
                 }
                 setInterval(this._checkForUpdates, this.config.checkForUpdatesInterval); // Check every 5 days
             }
             else {
-                console.log("Software updates disabled");
+                this.logger.log({
+                    level: 'error',
+                    message: "Software updates disabled"
+                });
             }
             resolve(true);
         });
