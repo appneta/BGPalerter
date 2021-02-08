@@ -31,6 +31,8 @@
  */
 
 import yargs from 'yargs';
+import fs from "fs";
+import yaml from "js-yaml";
 
 const params = yargs
     .usage('Usage: $0 <command> [options]')
@@ -39,7 +41,12 @@ const params = yargs
     })
     .example('$0 run -c config.yml', 'Run BGPalerter')
     .command('generate', 'Generate prefixes to monitor', function () {
-        yargs.alias('o', 'output')
+        yargs
+            .alias('v', 'version')
+            .nargs('v', 0)
+            .describe('v', 'Show version number')
+
+            .alias('o', 'output')
             .nargs('o', 1)
             .describe('o', 'Write to file')
 
@@ -49,15 +56,15 @@ const params = yargs
 
             .alias('e', 'exclude')
             .nargs('e', 1)
-            .describe('e', 'Prefixes to exclude')
+            .describe('e', 'Comma-separated list of prefixes to exclude')
 
             .alias('p', 'prefixes')
             .nargs('p', 1)
-            .describe('p', 'Prefixes to include')
+            .describe('p', 'Comma-separated list of prefixes to include')
 
             .alias('l', 'prefixes-file')
             .nargs('l', 1)
-            .describe('l', 'File containing the prefixes to include')
+            .describe('l', 'File containing the prefixes to include in the monitoring. One prefix for each line')
 
             .alias('i', 'ignore-delegated')
             .nargs('i', 0)
@@ -71,6 +78,26 @@ const params = yargs
             .nargs('m', 0)
             .describe('m', 'Automatically generate list of monitored ASes (options.monitorASns) from prefix origins.')
 
+            .alias('x', 'proxy')
+            .nargs('x', 1)
+            .describe('x', 'HTTP/HTTPS proxy to use')
+
+            .alias('g', 'group')
+            .nargs('g', 1)
+            .describe('x', 'Define a user group for all the generated rules.')
+
+            .alias('A', 'append')
+            .nargs('A', 0)
+            .describe('A', 'Append the new configuration to the previous one.')
+
+            .alias('D', 'debug')
+            .nargs('D', 0)
+            .describe('D', 'Provide verbose output for debugging')
+
+            .alias('H', 'historical')
+            .nargs('H', 0)
+            .describe('H', 'Use historical visibility data for generating prefix list (prefixes visible in the last week).')
+
             .demandOption(['o']);
     })
     .example('$0 generate -a 2914 -o prefixes.yml', 'Generate prefixes for AS2914')
@@ -82,6 +109,8 @@ const params = yargs
 switch(params._[0]) {
     case "generate":
         const generatePrefixes = require("./src/generatePrefixesList");
+        const debug = !!params.D;
+        const historical = !!params.H;
         let prefixes = null;
         let monitoredASes = false;
         if (params.pf) {
@@ -108,14 +137,33 @@ switch(params._[0]) {
             monitoredASes = true;
         }
 
-        generatePrefixes(
-            (params.a) ? params.a.toString().split(",") : null,
-            params.o,
-            (params.e || "").split(","),
-            params.i || false,
+        const inputParameters = {
+            asnList: (params.a) ? params.a.toString().split(",") : null,
+            outputFile: params.o,
+            exclude: (params.e) ? params.e.toString().split(",") : null,
+            excludeDelegated: params.i || false,
             prefixes,
-            monitoredASes
-        );
+            monitoredASes,
+            httpProxy: params.x || null,
+            debug,
+            historical,
+            group: params.g || null,
+            append: !!params.A,
+            logger: null,
+            getCurrentPrefixesList: () => {
+                return Promise.resolve(yaml.safeLoad(fs.readFileSync(params.o, "utf8")));
+            }
+        };
+
+        if (!inputParameters.outputFile) {
+            throw new Error("Output file not specified");
+        }
+
+        generatePrefixes(inputParameters)
+            .then(content => {
+                fs.writeFileSync(params.o, yaml.dump(content));
+                process.exit(0);
+            });
 
         break;
 
